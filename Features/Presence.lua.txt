@@ -1,0 +1,170 @@
+--==================================================
+-- CRUUZZ | VPS PRESENCE
+--==================================================
+
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+
+local Player = Players.LocalPlayer
+
+local API_BASE = "https://api.cruzzcomunity.com"
+
+local REGISTER_URL =
+    API_BASE .. "/api/lab/register"
+
+local HEARTBEAT_URL =
+    API_BASE .. "/api/lab/heartbeat"
+
+-- IMPORTANTE:
+-- usar solamente la LAB_CLIENT_KEY
+-- nunca DB_PASSWORD / JWT_SECRET / CLIENT_INGEST_KEY
+local LAB_KEY = "TU_LAB_KEY_REAL"
+
+local httpRequest =
+    (syn and syn.request)
+    or (http and http.request)
+    or http_request
+    or request
+
+
+local function GetExecutor()
+    local executor = "Unknown"
+
+    pcall(function()
+        if identifyexecutor then
+            executor = identifyexecutor()
+        elseif getexecutorname then
+            executor = getexecutorname()
+        elseif getexecutor then
+            executor = getexecutor()
+        end
+    end)
+
+    return tostring(executor)
+end
+
+
+local function Register()
+    if not httpRequest or not Player then
+        return false
+    end
+
+    local okEncode, body = pcall(function()
+        return HttpService:JSONEncode({
+            userId = tostring(Player.UserId),
+
+            username = Player.Name,
+            name = Player.Name,
+
+            displayName = Player.DisplayName,
+
+            placeId = tostring(game.PlaceId),
+            jobId = game.JobId,
+
+            executor = GetExecutor(),
+
+            clientVersion = "CRUUZZ-YOKUDO-1.0"
+        })
+    end)
+
+    if not okEncode then
+        return false
+    end
+
+
+    local ok, response = pcall(function()
+        return httpRequest({
+            Url = REGISTER_URL,
+
+            Method = "POST",
+
+            Headers = {
+                ["Content-Type"] = "application/json",
+                ["x-lab-key"] = LAB_KEY,
+            },
+
+            Body = body
+        })
+    end)
+
+
+    if not ok or not response then
+        return false
+    end
+
+
+    local status =
+        tonumber(response.StatusCode or response.Status) or 0
+
+    return status >= 200 and status < 300
+end
+
+
+local function Heartbeat()
+    if not httpRequest or not Player then
+        return false
+    end
+
+
+    local okEncode, body = pcall(function()
+        return HttpService:JSONEncode({
+            userId = tostring(Player.UserId),
+
+            placeId = tostring(game.PlaceId),
+            jobId = game.JobId,
+        })
+    end)
+
+    if not okEncode then
+        return false
+    end
+
+
+    local ok, response = pcall(function()
+        return httpRequest({
+            Url = HEARTBEAT_URL,
+
+            Method = "POST",
+
+            Headers = {
+                ["Content-Type"] = "application/json",
+                ["x-lab-key"] = LAB_KEY,
+            },
+
+            Body = body
+        })
+    end)
+
+
+    if not ok or not response then
+        return false
+    end
+
+
+    local status =
+        tonumber(response.StatusCode or response.Status) or 0
+
+    return status >= 200 and status < 300
+end
+
+
+_G.CRUUZZ_Presence = {
+    Register = Register,
+    Heartbeat = Heartbeat
+}
+
+
+task.spawn(function()
+
+    -- registrar una vez
+    Register()
+
+    while true do
+
+        task.wait(18)
+
+        Heartbeat()
+
+    end
+
+end)
