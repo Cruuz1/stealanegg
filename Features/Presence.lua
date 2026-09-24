@@ -15,10 +15,8 @@ local REGISTER_URL =
 local HEARTBEAT_URL =
     API_BASE .. "/api/lab/heartbeat"
 
--- IMPORTANTE:
--- usar solamente la LAB_CLIENT_KEY
--- nunca DB_PASSWORD / JWT_SECRET / CLIENT_INGEST_KEY
-local LAB_KEY = "TU_LAB_KEY_REAL"
+
+local LAB_KEY = "0c6d9b03b0d061727bb557447256544f3de0b84503d03227791209d9a937306e"
 
 local httpRequest =
     (syn and syn.request)
@@ -63,7 +61,7 @@ local function Register()
 
             executor = GetExecutor(),
 
-            clientVersion = "CRUUZZ-YOKUDO-1.0"
+            clientVersion = "CRUUZZ-1.0"
         })
     end)
 
