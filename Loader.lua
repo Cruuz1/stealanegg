@@ -2,7 +2,7 @@
 -- Cruuzz HUB | STEAL AN EGG | Loader
 -- ==================================================
 
-local BASE_URL = "https://raw.githubusercontent.com/betdoyvaka/stealanegg/main/"
+local BASE_URL = "https://raw.githubusercontent.com/Cruuz1/stealanegg/main/"
 
 _G.Cruuzz_EnablePrint = false
 
