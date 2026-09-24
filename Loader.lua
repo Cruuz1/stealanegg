@@ -167,8 +167,6 @@ loadstring(GetScript("UI.lua"))()
 Loading.Update(20)
 loadstring(GetScript("Components.lua"))()
 
-Loading.Update(22)
-loadstring(GetScript("Features/Presence.lua"))()
 
 -- ==================================================
 -- LOAD TABS MANAGER
